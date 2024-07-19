@@ -28,35 +28,24 @@ public class JpaMain {
             member.setUsername("teamA");
             member.setAge(10);
             member.setTeam(team);
+            member.setType(MemberType.ADMIN);
 
             em.persist(member);
 
-            // 조인
+            // JPQL 타입 표현과 기타식
 
-            // inner
+//            Query query = em.createQuery("select m.username, 'HELLO', true from Member m " +
+//                    "where m.type = jpql.MemberType.ADMIN");
+            Query query = em.createQuery("select m.username, 'HELLO', true from Member m " +
+                    "where m.type = :userType")
+                    .setParameter("userType", MemberType.ADMIN);
+            List<Object[]> resultList = query.getResultList();
 
-//            List<Member> result = em.createQuery("select m from Member m inner join m.team t", Member.class)
-//                    .getResultList();
-
-            // outer
-
-//            List<Member> result = em.createQuery("select m from Member m left join m.team t", Member.class)
-//                    .getResultList();
-
-            // outer on 절(조인 대상 필터링, 연관관계 있을때)
-//            List<Member> result = em.createQuery("select m from Member m left join m.team t on t.name = 'teamA'", Member.class)
-//                    .getResultList();
-
-            // outer on 절(조인 대상 필터링, 연관관계 없을때)
-
-            List<Member> result = em.createQuery("select m from Member m left join m.team t on m.username = t.name", Member.class)
-                    .getResultList();
-
-            // 세타 조인 (막조인, 연관관계가 없을때)
-
-//            List<Member> result = em.createQuery("select m from Member m, Team t where m.username = t.name", Member.class)
-//                    .getResultList();
-
+            for (Object[] objects : resultList) {
+                System.out.println("objects[0] = " + objects[0]);
+                System.out.println("objects[1] = " + objects[1]);
+                System.out.println("objects[2] = " + objects[2]);
+            }
 
             tx.commit();
         } catch (Exception e) {
