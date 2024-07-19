@@ -23,34 +23,53 @@ public class JpaMain {
             team.setName("teamA");
             em.persist(team);
 
-            Member member = new Member();
+            Member member1 = new Member();
 //            member.setUsername("member1");
 //            member.setUsername("teamA");
 //            member.setUsername(null);
-            member.setUsername("관리자");
-            member.setAge(10);
-            member.setTeam(team);
-            member.setType(MemberType.ADMIN);
+            member1.setUsername("관리자1");
+            member1.setAge(10);
+            member1.setTeam(team);
+            member1.setType(MemberType.ADMIN);
 
-            em.persist(member);
+            Member member2 = new Member();
+            member2.setUsername("관리자2");
+            member2.setAge(10);
+            member2.setTeam(team);
+            member2.setType(MemberType.ADMIN);
+
+            em.persist(member1);
+            em.persist(member2);
 
             em.flush();
             em.clear();
 
-            // case 식
-//            TypedQuery<String> query = em.createQuery(
-//                    "select " +
-//                            "case when m.age <= 10 then '학생요금' " +
-//                            "         when m.age >= 60 then '경로요금' " +
-//                            "         else '일반요금' " +
-//                            "end " +
-//                            "from Member m", String.class);
+            // jpql 함수
 
-            // coalesce: 하나씩 조회해서 null이 아니면 반환
-//            TypedQuery<String> query = em.createQuery("select coalesce(m.username, '이름 없는 회원') as username from Member  m", String.class);
+            // concat
+//            TypedQuery<String> query = em.createQuery("select concat('a', 'b') from Member  m", String.class);
+//            TypedQuery<String> query = em.createQuery("select 'a' || 'b' from Member  m", String.class);
 
-            // nullif: 두 값이 같으면 null 반환, 다르면 첫 번째 값 반환
-            TypedQuery<String> query = em.createQuery("select nullif(m.username, '관리자') as username from Member  m", String.class);
+//            TypedQuery<String> query = em.createQuery("select concat('a', 'b') from Member  m", String.class);
+
+            // substring
+//            TypedQuery<String> query = em.createQuery("select substring(m.username, 2, 3) from Member  m", String.class);
+
+            // trim
+//            TypedQuery<String> query = em.createQuery("select trim(m.username) from Member  m", String.class);
+
+            // length
+//            TypedQuery<Integer> query = em.createQuery("select length(m.username) from Member  m", Integer.class);
+
+            // locate
+//            TypedQuery<Integer> query = em.createQuery("select locate('de', 'abcdefg') from Member  m", Integer.class);
+
+            // size
+//            TypedQuery<Integer> query = em.createQuery("select size(t.members) from Team  t", Integer.class);
+
+            // 사용자정의 함수
+//            TypedQuery<String> query = em.createQuery("select function('group_concat', m.username) from Member  m", String.class);
+            TypedQuery<String> query = em.createQuery("select group_concat(m.username) from Member  m", String.class);
 
             List<String> result = query.getResultList();
 
