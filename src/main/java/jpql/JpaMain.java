@@ -18,78 +18,27 @@ public class JpaMain {
         tx.begin();
 
         try {
-            Member member = new Member();
-            Team team = new Team();
-            Order order = new Order();
-            member.setUsername("member1");
-            member.setTeam(team);
 
-            Address address = new Address();
-            address.setCity("Seoul");
-            address.setStreet("street");
-            address.setZipcode("12345");
-            order.setAddress(address);
 
-            em.persist(member);
-            em.persist(team);
-            em.persist(order);
+            for (int i = 0; i < 100; i++) {
+                Member member = new Member();
+                member.setUsername("member" + i);
+                member.setAge(i);
+                em.persist(member);
 
-            // 프로젝션(SELECT)
-            // 엔티티 프로젝션, 임베디드 프로젝션, 스칼라 프로젝션
+            }
 
-            em.flush();
-            em.clear();
 
-            // 엔티티 프로젝션
-            // 찾은 결과는 영속성 컨텍스트에서 관리됨
-
-            List<Member> result = em.createQuery("select m from Member m", Member.class)
+            // 페이징
+            List<Member> result = em.createQuery("select m from Member m order by m.age desc", Member.class)
+                    .setFirstResult(1)
+                    .setMaxResults(10)
                     .getResultList();
 
-            Member findMember = result.get(0);
-            findMember.setAge(20);
-            System.out.println("findMember = " + findMember);
-
-            // 엔티티 프로젝션
-
-            // List<Team> resultList1 = em.createQuery("select m.team from Member m", Team.class)
-            //        .getResultList(); -> 좋지 않음. 예측불가
-
-            List<Team> result2 = em.createQuery("select t from Member m join m.team t", Team.class)
-                    .getResultList(); // 예측 가능
-
-            Team resultTeam = result2.get(0);
-
-            // 임베디드 타입 프로젝션
-            List<Address> result3 = em.createQuery("select o.address from Order o", Address.class)
-                    .getResultList();
-            Address findAddress = result3.get(0);
-
-            // 스칼라 프로젝션
-//            List resultList = em.createQuery("select distinct m.username, m.age from Member m")
-//                    .getResultList();
-//
-//            Object[] sResult = (Object[]) resultList.get(0);
-//            System.out.println("username = " + sResult[0]);
-//            System.out.println("age = " + sResult[1]);
-
-            // 스칼라 + 제네릭
-
-//            List<Object[]> resultList = em.createQuery("select distinct m.username, m.age from Member m")
-//                    .getResultList();
-//
-//            Object[] sResult = resultList.get(0);
-//            System.out.println("username = " + sResult[0]);
-//            System.out.println("age = " + sResult[1]);
-
-            // 스칼라 + DTO
-
-            List<MemberDto> resultList = em.createQuery("select distinct new jpql.MemberDto(m.username, m.age) from Member m", MemberDto.class)
-                    .getResultList();
-
-            MemberDto memberDto = resultList.get(0);
-            System.out.println("username = " + memberDto.getUsername());
-            System.out.println("age = " + memberDto.getAge());
+            System.out.println("result.size() = " + result.size());
+            for (Member m : result) {
+                System.out.println("member = " + m);
+            }
 
 
             tx.commit();
