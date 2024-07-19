@@ -19,26 +19,43 @@ public class JpaMain {
 
         try {
 
+            Team team = new Team();
+            team.setName("teamA");
+            em.persist(team);
 
-            for (int i = 0; i < 100; i++) {
-                Member member = new Member();
-                member.setUsername("member" + i);
-                member.setAge(i);
-                em.persist(member);
+            Member member = new Member();
+//            member.setUsername("member1");
+            member.setUsername("teamA");
+            member.setAge(10);
+            member.setTeam(team);
 
-            }
+            em.persist(member);
 
+            // 조인
 
-            // 페이징
-            List<Member> result = em.createQuery("select m from Member m order by m.age desc", Member.class)
-                    .setFirstResult(1)
-                    .setMaxResults(10)
+            // inner
+
+//            List<Member> result = em.createQuery("select m from Member m inner join m.team t", Member.class)
+//                    .getResultList();
+
+            // outer
+
+//            List<Member> result = em.createQuery("select m from Member m left join m.team t", Member.class)
+//                    .getResultList();
+
+            // outer on 절(조인 대상 필터링, 연관관계 있을때)
+//            List<Member> result = em.createQuery("select m from Member m left join m.team t on t.name = 'teamA'", Member.class)
+//                    .getResultList();
+
+            // outer on 절(조인 대상 필터링, 연관관계 없을때)
+
+            List<Member> result = em.createQuery("select m from Member m left join m.team t on m.username = t.name", Member.class)
                     .getResultList();
 
-            System.out.println("result.size() = " + result.size());
-            for (Member m : result) {
-                System.out.println("member = " + m);
-            }
+            // 세타 조인 (막조인, 연관관계가 없을때)
+
+//            List<Member> result = em.createQuery("select m from Member m, Team t where m.username = t.name", Member.class)
+//                    .getResultList();
 
 
             tx.commit();
