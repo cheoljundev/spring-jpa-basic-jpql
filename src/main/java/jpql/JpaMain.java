@@ -25,27 +25,39 @@ public class JpaMain {
 
             Member member = new Member();
 //            member.setUsername("member1");
-            member.setUsername("teamA");
+//            member.setUsername("teamA");
+//            member.setUsername(null);
+            member.setUsername("관리자");
             member.setAge(10);
             member.setTeam(team);
             member.setType(MemberType.ADMIN);
 
             em.persist(member);
 
-            // JPQL 타입 표현과 기타식
+            em.flush();
+            em.clear();
 
-//            Query query = em.createQuery("select m.username, 'HELLO', true from Member m " +
-//                    "where m.type = jpql.MemberType.ADMIN");
-            Query query = em.createQuery("select m.username, 'HELLO', true from Member m " +
-                    "where m.type = :userType")
-                    .setParameter("userType", MemberType.ADMIN);
-            List<Object[]> resultList = query.getResultList();
+            // case 식
+//            TypedQuery<String> query = em.createQuery(
+//                    "select " +
+//                            "case when m.age <= 10 then '학생요금' " +
+//                            "         when m.age >= 60 then '경로요금' " +
+//                            "         else '일반요금' " +
+//                            "end " +
+//                            "from Member m", String.class);
 
-            for (Object[] objects : resultList) {
-                System.out.println("objects[0] = " + objects[0]);
-                System.out.println("objects[1] = " + objects[1]);
-                System.out.println("objects[2] = " + objects[2]);
+            // coalesce: 하나씩 조회해서 null이 아니면 반환
+//            TypedQuery<String> query = em.createQuery("select coalesce(m.username, '이름 없는 회원') as username from Member  m", String.class);
+
+            // nullif: 두 값이 같으면 null 반환, 다르면 첫 번째 값 반환
+            TypedQuery<String> query = em.createQuery("select nullif(m.username, '관리자') as username from Member  m", String.class);
+
+            List<String> result = query.getResultList();
+
+            for (String s : result) {
+                System.out.println("s = " + s);
             }
+
 
             tx.commit();
         } catch (Exception e) {
