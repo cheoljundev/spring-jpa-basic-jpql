@@ -69,7 +69,10 @@ public class JpaMain {
 
             TypedQuery<Team> query = em.createQuery("select t from Team  t join fetch t.members", Team.class);
 
-            List<Team> result = query.getResultList();
+            List<Team> result = query
+                    .setFirstResult(0)
+                    .setMaxResults(2)
+                    .getResultList();
 
             for (Team t : result) {
                 System.out.println("team = " + t.getName() + "|members = " + t.getMembers().size());
