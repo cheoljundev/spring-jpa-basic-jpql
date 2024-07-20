@@ -53,34 +53,15 @@ public class JpaMain {
             em.flush();
             em.clear();
 
-            // fetch 조인
+            // named query
 
-            // ManyToOne fetch 조인
-//            TypedQuery<Member> query = em.createQuery("select m from Member  m", Member.class); // n+1 문제 발생
-            // TypedQuery<Member> query = em.createQuery("select m from Member  m join fetch m.team", Member.class); // fetch join으로 해결
-
-//            List<Member> result = query.getResultList();
-//
-//            for (Member m : result) {
-//                System.out.println("member = " + m.getUsername() + ", " + m.getTeam().getName());
-//            }
-
-            // 컬렉션 fetch 조인, OneToMany
-
-            TypedQuery<Team> query = em.createQuery("select t from Team  t join fetch t.members", Team.class);
-
-            List<Team> result = query
-                    .setFirstResult(0)
-                    .setMaxResults(2)
+            List<Member> resultList = em.createNamedQuery("Member.findByUsername", Member.class)
+                    .setParameter("username", "회원1")
                     .getResultList();
 
-            for (Team t : result) {
-                System.out.println("team = " + t.getName() + "|members = " + t.getMembers().size());
-                for (Member member : t.getMembers()) {
-                    System.out.println("member = " + member);
-                }
+            for (Member member : resultList) {
+                System.out.println("member = " + member);
             }
-
 
             tx.commit();
         } catch (Exception e) {

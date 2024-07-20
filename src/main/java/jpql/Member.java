@@ -3,6 +3,11 @@ package jpql;
 import jakarta.persistence.*;
 
 @Entity
+@NamedQuery(
+        name = "Member.findByUsername",
+//        query = "select m from Member mQQ where m.username = :username" // 애플리케이션 로딩 시점에 에러 잡아줌.
+        query = "select m from Member m where m.username = :username"
+)
 public class Member {
 
     @Id @GeneratedValue
