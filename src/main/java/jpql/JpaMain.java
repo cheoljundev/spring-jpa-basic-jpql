@@ -19,62 +19,63 @@ public class JpaMain {
 
         try {
 
-            Team team = new Team();
-            team.setName("teamA");
-            em.persist(team);
+            Team teamA = new Team();
+            teamA.setName("teamA");
+            em.persist(teamA);
+
+            Team teamB = new Team();
+            teamB.setName("teamB");
+            em.persist(teamB);
 
             Member member1 = new Member();
-//            member.setUsername("member1");
-//            member.setUsername("teamA");
-//            member.setUsername(null);
-            member1.setUsername("관리자1");
+            member1.setUsername("회원1");
             member1.setAge(10);
-            member1.setTeam(team);
+            member1.setTeam(teamA);
             member1.setType(MemberType.ADMIN);
+            em.persist(member1);
+
 
             Member member2 = new Member();
-            member2.setUsername("관리자2");
+            member2.setUsername("회원2");
             member2.setAge(10);
-            member2.setTeam(team);
+            member2.setTeam(teamB);
             member2.setType(MemberType.ADMIN);
-
-            em.persist(member1);
             em.persist(member2);
+
+            Member member3 = new Member();
+            member3.setUsername("회원3");
+            member3.setAge(10);
+            member3.setTeam(teamB);
+            member3.setType(MemberType.ADMIN);
+            em.persist(member3);
+
 
             em.flush();
             em.clear();
 
-            // jpql 함수
+            // fetch 조인
 
-            // concat
-//            TypedQuery<String> query = em.createQuery("select concat('a', 'b') from Member  m", String.class);
-//            TypedQuery<String> query = em.createQuery("select 'a' || 'b' from Member  m", String.class);
+            // ManyToOne fetch 조인
+//            TypedQuery<Member> query = em.createQuery("select m from Member  m", Member.class); // n+1 문제 발생
+            // TypedQuery<Member> query = em.createQuery("select m from Member  m join fetch m.team", Member.class); // fetch join으로 해결
 
-//            TypedQuery<String> query = em.createQuery("select concat('a', 'b') from Member  m", String.class);
+//            List<Member> result = query.getResultList();
+//
+//            for (Member m : result) {
+//                System.out.println("member = " + m.getUsername() + ", " + m.getTeam().getName());
+//            }
 
-            // substring
-//            TypedQuery<String> query = em.createQuery("select substring(m.username, 2, 3) from Member  m", String.class);
+            // 컬렉션 fetch 조인, OneToMany
 
-            // trim
-//            TypedQuery<String> query = em.createQuery("select trim(m.username) from Member  m", String.class);
+            TypedQuery<Team> query = em.createQuery("select t from Team  t join fetch t.members", Team.class);
 
-            // length
-//            TypedQuery<Integer> query = em.createQuery("select length(m.username) from Member  m", Integer.class);
+            List<Team> result = query.getResultList();
 
-            // locate
-//            TypedQuery<Integer> query = em.createQuery("select locate('de', 'abcdefg') from Member  m", Integer.class);
-
-            // size
-//            TypedQuery<Integer> query = em.createQuery("select size(t.members) from Team  t", Integer.class);
-
-            // 사용자정의 함수
-//            TypedQuery<String> query = em.createQuery("select function('group_concat', m.username) from Member  m", String.class);
-            TypedQuery<String> query = em.createQuery("select group_concat(m.username) from Member  m", String.class);
-
-            List<String> result = query.getResultList();
-
-            for (String s : result) {
-                System.out.println("s = " + s);
+            for (Team t : result) {
+                System.out.println("team = " + t.getName() + "|members = " + t.getMembers().size());
+                for (Member member : t.getMembers()) {
+                    System.out.println("member = " + member);
+                }
             }
 
 
