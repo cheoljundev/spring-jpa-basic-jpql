@@ -49,19 +49,19 @@ public class JpaMain {
             member3.setType(MemberType.ADMIN);
             em.persist(member3);
 
+            // 벌크 연산
+            // 영속성 컨텍스트 무시하고 데이터베이스에 직접 쿼리
+            // 벌크업 연산 이후에는 영속성 컨텍스트 초기화 필요
 
-            em.flush();
+            int resultCount = em.createQuery("update Member m set m.age = 20")
+                    .executeUpdate();
+
+            System.out.println("resultCount = " + resultCount);
+
             em.clear();
 
-            // named query
-
-            List<Member> resultList = em.createNamedQuery("Member.findByUsername", Member.class)
-                    .setParameter("username", "회원1")
-                    .getResultList();
-
-            for (Member member : resultList) {
-                System.out.println("member = " + member);
-            }
+            Member member = em.find(Member.class, member1.getId());
+            System.out.println("member = " + member);
 
             tx.commit();
         } catch (Exception e) {
